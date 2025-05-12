@@ -15,7 +15,7 @@ pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 if "pdf-chatbot" not in pc.list_indexes().names():
     pc.create_index(
         name="pdf-chatbot",
-        dimension=384,
+        dimension=768,
         metric="cosine",
         spec=ServerlessSpec(
             cloud="aws",
@@ -26,7 +26,8 @@ if "pdf-chatbot" not in pc.list_indexes().names():
 # Connect to the index
 index = pc.Index("pdf-chatbot")
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+# model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("all-mpnet-base-v2")
 
 text_chunks = []
 embeddings = []
