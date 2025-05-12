@@ -5,7 +5,12 @@ from pdf_utils import extract_text
 from search import process_text, get_top_k_chunks
 from typing import List
 from fastapi import UploadFile
-client = 'APIKEY' #CHANGE API KEY
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
 app.add_middleware(
@@ -26,7 +31,10 @@ async def upload(files: List[UploadFile] = File(...)):
 @app.post("/ask/")
 async def ask(question: str = Form(...)):
     chunks = get_top_k_chunks(question)
-    prompt = f"""Answer the question based only on the context below.
+    prompt = f"""
+You are a helpful assistant that answers questions based on the context provided.
+
+Use only the information in the context. Be specific, detailed, and use complete sentences.
 
 Context:
 {chr(10).join(chunks)}
@@ -34,12 +42,13 @@ Context:
 Question: {question}
 Answer:"""
 
+
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
+            {"role": "system", "content": "You are a precise, detailed assistant. Only use the context provided to answer the question thoroughly."},
             {"role": "user", "content": prompt}
         ]
-    )
 
-    print(chunks)
+    )
     return {"answer": response.choices[0].message.content}
