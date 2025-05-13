@@ -134,7 +134,7 @@ function App() {
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Ask a question..."
           />
-          <button onClick={handleAsk}>Send</button>
+          <button onClick={handleAsk} disabled={question.trim() === ""}>Send</button>
         </div>
       </div>
     </div>
